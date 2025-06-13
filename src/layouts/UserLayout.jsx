@@ -1,30 +1,25 @@
 import Numpad from "../components/numpad/Numpad";
+import ProductsList from "../components/productsList/ProductsList";
+import UserData from "../components/userData/UserData";
 
 function UserLayout() {
   return (
     <div className="flex flex-col min-h-screen w-full bg-amber-300">
-      
+
       {/* Header */}
       <div className="flex justify-between items-center h-16 w-full bg-blue-400 px-4">
         <div className="text-lg font-bold text-white">Test</div>
-        <div className="text-white">Username</div>
+        <UserData/>
       </div>
 
       {/* Search Bar & Product List */}
       <div className="flex flex-col md:flex-row w-full flex-grow-0 bg-white">
-        <div className="w-full md:w-1/3 p-2">
-          {/* Replace with actual SearchBar component */}
-          <div className="bg-gray-200 rounded p-2">SearchBarComponent</div>
-        </div>
-        <div className="w-full md:w-2/3 p-2">
-          {/* Replace with actual ProductList component */}
-          <div className="bg-gray-300 rounded p-2">ProductListSlider Component</div>
-        </div>
+        <ProductsList />
       </div>
 
       {/* Main Section */}
       <div className="flex flex-col lg:flex-row flex-grow bg-red-400 w-full p-2 gap-4">
-        
+
         {/* Receipt Area */}
         <div className="flex flex-col w-full lg:w-3/5 h-full gap-2">
           <div className="bg-amber-300 p-2 rounded">SearchCustomer</div>

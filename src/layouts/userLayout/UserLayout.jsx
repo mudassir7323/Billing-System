@@ -1,6 +1,6 @@
-import Numpad from "../components/numpad/Numpad";
-import ProductsList from "../components/productsList/ProductsList";
-import UserData from "../components/userData/UserData";
+import Numpad from "../../components/numpad/Numpad";
+import ProductsList from "../../components/productsList/ProductsList";
+import UserData from "../../components/userData/UserData";
 
 function UserLayout() {
   return (

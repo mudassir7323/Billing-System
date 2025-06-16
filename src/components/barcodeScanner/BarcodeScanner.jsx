@@ -1,77 +1,68 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { BrowserMultiFormatReader } from '@zxing/browser';
+import React, { useEffect, useRef, useState } from "react";
+import { BrowserMultiFormatReader } from "@zxing/browser";
 
-const BarcodeReader = () => {
+function BarcodeScanner() {
+  const [barcodeText, setBarcodeText] = useState("Barcode not read");
   const videoRef = useRef(null);
   const codeReaderRef = useRef(null);
-  const [barcodeText, setBarcodeText] = useState("Not read");
 
   useEffect(() => {
-    const codeReader = new BrowserMultiFormatReader();
-    codeReaderRef.current = codeReader;
+    codeReaderRef.current = new BrowserMultiFormatReader();
 
-    const initScanner = async () => {
+    const startScanner = async () => {
       try {
-        const devices = await BrowserMultiFormatReader.listVideoInputDevices();
-        const selectedDeviceId = devices[0]?.deviceId;
+        const codeReader = codeReaderRef.current;
 
-        if (!selectedDeviceId) {
-          console.error("No video input devices found.");
-          return;
-        }
-
-        await codeReader.decodeFromVideoDevice(
-          selectedDeviceId,
+        await codeReader.decodeFromConstraints(
+          {
+            video: {
+              facingMode: { ideal: "environment" }, // safer for both laptop and mobile
+              width: { ideal: 640 },
+              height: { ideal: 480 },
+            },
+          },
           videoRef.current,
           (result, err) => {
             if (result) {
               setBarcodeText(result.getText());
 
-              // Stop scanner
-              if (codeReaderRef.current) {
-                codeReaderRef.current.stopContinuousDecode();
-              }
-
-              // Also stop the video stream
-              if (videoRef.current && videoRef.current.srcObject) {
-                const tracks = videoRef.current.srcObject.getTracks();
-                tracks.forEach((track) => track.stop());
-              }
+              // Stop the stream manually
+              const tracks = videoRef.current?.srcObject?.getTracks();
+              tracks?.forEach((track) => track.stop());
             }
           }
         );
       } catch (error) {
-        console.error("Camera initialization error:", error);
+        console.error("Error accessing camera:", error);
+        setBarcodeText("Camera access failed or not available");
       }
     };
 
-    initScanner();
+    startScanner();
 
     return () => {
-      // Cleanup
-      if (videoRef.current && videoRef.current.srcObject) {
-        const tracks = videoRef.current.srcObject.getTracks();
-        tracks.forEach((track) => track.stop());
-      }
+      const tracks = videoRef.current?.srcObject?.getTracks();
+      tracks?.forEach((track) => track.stop());
     };
   }, []);
 
   return (
-    <div className="flex flex-col items-center p-4 rounded-xl bg-white shadow-md max-w-sm mx-auto">
-      <h2 className="text-lg font-semibold mb-4">Scan Barcode</h2>
+    <div className="flex flex-col items-center gap-4 p-4 bg-gray-100 rounded-xl shadow-lg w-full max-w-md mx-auto mt-10">
+      <h2 className="text-xl font-semibold text-gray-700">Scan Barcode</h2>
 
-      <div className="w-64 h-40 overflow-hidden rounded-md border shadow-sm">
-        <video ref={videoRef} className="w-full h-full object-cover" />
-      </div>
+      <video
+        ref={videoRef}
+        className="w-full h-auto max-h-64 rounded-lg border border-gray-300 object-cover"
+        autoPlay
+        muted
+        playsInline
+      />
 
-      <div className="mt-4 text-center">
-        <p className="text-sm text-gray-500">Scanned Barcode:</p>
-        <p className="text-md font-bold text-blue-600 break-words">
-          {barcodeText}
-        </p>
+      <div className="text-center mt-4 text-lg font-medium text-blue-700">
+        {barcodeText}
       </div>
     </div>
   );
-};
+}
 
-export default BarcodeReader;
+export default BarcodeScanner;
